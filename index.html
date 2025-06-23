@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disk Transfer Time Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full">
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Disk Data Transfer Time Calculator</h1>
+    <form id="calcForm" class="space-y-4">
+      <div>
+        <label for="type" class="block text-sm font-medium text-gray-700">Calculation Type</label>
+        <select id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="random">1. Random Record Access</option>
+          <option value="sameCyl">2. Sequential on Same Cylinder</option>
+          <option value="diffCyl">3. Sequential on Different Cylinders</option>
+        </select>
+      </div>
+      <div>
+        <label for="accessTime" class="block text-sm font-medium text-gray-700">Access Motion Time (ms)</label>
+        <input type="number" id="accessTime" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div>
+        <label for="rpm" class="block text-sm font-medium text-gray-700">Rotation Speed</label>
+        <input type="number" id="rpm" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div>
+        <label for="rpmUnit" class="block text-sm font-medium text-gray-700">Speed Unit</label>
+        <select id="rpmUnit" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="rpm">RPM (revolutions per minute)</option>
+          <option value="rps">RPS (revolutions per second)</option>
+        </select>
+      </div>
+      <div>
+        <label for="transferRate" class="block text-sm font-medium text-gray-700">Data Transfer Rate (bytes/sec)</label>
+        <input type="number" id="transferRate" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div>
+        <label for="recordLength" class="block text-sm font-medium text-gray-700">Record Length (bytes)</label>
+        <input type="number" id="recordLength" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div>
+        <label for="blockingFactor" class="block text-sm font-medium text-gray-700">Blocking Factor</label>
+        <input type="number" id="blockingFactor" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div id="recordsField">
+        <label for="numRecords" class="block text-sm font-medium text-gray-700">Number of Records</label>
+        <input type="number" id="numRecords" step="1" value="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div id="trackField">
+        <label for="recordsPerTrack" class="block text-sm font-medium text-gray-700">Records per Track</label>
+        <input type="number" id="recordsPerTrack" step="1" value="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <div>
+        <label for="decimalPlaces" class="block text-sm font-medium text-gray-700">Decimal Places to Round To</label>
+        <input type="number" id="decimalPlaces" value="3" min="0" max="10" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+      </div>
+      <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Calculate</button>
+    </form>
+    <div id="resultBox" class="mt-6 p-4 bg-gray-50 rounded-md text-gray-800 font-mono text-sm"></div>
+  </div>
+
+  <script>
+    function formatNumber(value, dp, minDp = 6) {
+      const absValue = Math.abs(value);
+      let precision = dp;
+      if (absValue > 0 && absValue < Math.pow(10, -dp)) {
+        precision = minDp;
+      }
+      return value.toFixed(precision);
+    }
+
+    function maxPrecision(...values) {
+      return Math.max(...values.map(v => {
+        const str = v.toString().split('.')[1] || '';
+        return str.length;
+      }));
+    }
+
+    function toggleFields() {
+      const type = document.getElementById("type").value;
+      const recordsField = document.getElementById("recordsField");
+      const trackField = document.getElementById("trackField");
+      recordsField.style.display = type === "random" ? "none" : "block";
+      trackField.style.display = type === "random" ? "none" : "block";
+    }
+
+    document.getElementById("type").addEventListener("change", toggleFields);
+    toggleFields();
+
+    document.getElementById("calcForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const A = parseFloat(document.getElementById("accessTime").value) / 1000;
+      let rpm = parseFloat(document.getElementById("rpm").value);
+      const rpmUnit = document.getElementById("rpmUnit").value;
+      const D = parseFloat(document.getElementById("transferRate").value);
+      const L = parseFloat(document.getElementById("recordLength").value);
+      const B = parseFloat(document.getElementById("blockingFactor").value);
+      const N = parseInt(document.getElementById("numRecords").value) || 1;
+      const P = parseInt(document.getElementById("recordsPerTrack").value) || 1;
+      const type = document.getElementById("type").value;
+      const dp = parseInt(document.getElementById("decimalPlaces").value);
+
+      const revPerSec = rpmUnit === "rpm" ? rpm / 60 : rpm;
+      const R = 1 / revPerSec;
+
+      let formula = "";
+      let plugIn = "";
+      let calcString = "";
+      let breakdown = "";
+      let fullResult = 0;
+      let terms = [];
+
+      if (type === "random") {
+        const a = A;
+        const r2 = R / 2;
+        const trans = (B * L) / D;
+        fullResult = a + r2 + trans;
+
+        terms = [a, r2, trans];
+        const maxDp = maxPrecision(...terms);
+        const aStr = formatNumber(a, dp, maxDp);
+        const r2Str = formatNumber(r2, dp, maxDp);
+        const transStr = formatNumber(trans, dp, maxDp);
+
+        formula = "D = A + R/2 + (B × L) / D";
+        plugIn = `D = ${A * 1000}/1000 + (1/(${rpm}${rpmUnit === 'rpm' ? '/60' : ''}))/2 + (${B} × ${L})/${D}`;
+        calcString = `= ${aStr} + ${r2Str} + ${transStr}`;
+        breakdown = `= ${fullResult.toFixed(dp)} seconds`;
+      } else if (type === "sameCyl") {
+        const a = A;
+        const r2 = R / 2;
+        const seeks = r2 * (N / P);
+        const trans = ((B * L) / D) * (N / B);
+        fullResult = a + seeks + trans;
+
+        terms = [a, seeks, trans];
+        const maxDp = maxPrecision(...terms);
+        const aStr = formatNumber(a, dp, maxDp);
+        const seeksStr = formatNumber(seeks, dp, maxDp);
+        const transStr = formatNumber(trans, dp, maxDp);
+
+        formula = "D = A + (R/2 × N / P) + ((B × L) / D × N / B)";
+        plugIn = `D = ${A * 1000}/1000 + ((1/(${rpm}${rpmUnit === 'rpm' ? '/60' : ''}))/2 × ${N}/${P}) + ((${B} × ${L})/${D} × ${N}/${B})`;
+        calcString = `= ${aStr} + ${seeksStr} + ${transStr}`;
+        breakdown = `= ${fullResult.toFixed(dp)} seconds`;
+      } else if (type === "diffCyl") {
+        const access = A * (N / P);
+        const r2 = R / 2;
+        const seeks = r2 * (N / P);
+        const trans = ((B * L) / D) * (N / B);
+        fullResult = access + seeks + trans;
+
+        terms = [access, seeks, trans];
+        const maxDp = maxPrecision(...terms);
+        const accessStr = formatNumber(access, dp, maxDp);
+        const seeksStr = formatNumber(seeks, dp, maxDp);
+        const transStr = formatNumber(trans, dp, maxDp);
+
+        formula = "D = A × (N / P) + (R/2 × N / P) + ((B × L) / D × N / B)";
+        plugIn = `D = ${A * 1000}/1000 × (${N}/${P}) + ((1/(${rpm}${rpmUnit === 'rpm' ? '/60' : ''}))/2 × ${N}/${P}) + ((${B} × ${L})/${D} × ${N}/${B})`;
+        calcString = `= ${accessStr} + ${seeksStr} + ${transStr}`;
+        breakdown = `= ${fullResult.toFixed(dp)} seconds`;
+      }
+
+      document.getElementById("resultBox").innerHTML = `
+        <strong>Formula Used:</strong><br>${formula}<br><br>
+        <strong>Expression (Plugged-In):</strong><br>${plugIn}<br><br>
+        <strong>Calculated Step-by-Step:</strong><br>${calcString}<br>${breakdown}<br><br>
+        <strong>Final Result:</strong> ${fullResult.toFixed(dp)} seconds<br><br>
+        <em>Note: Intermediate values are shown with up to 6 decimal places for clarity.</em>
+      `;
+    });
+  </script>
+</body>
+</html>
