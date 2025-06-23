@@ -63,20 +63,9 @@
   </div>
 
   <script>
-    function formatNumber(value, dp, minDp = 6) {
-      const absValue = Math.abs(value);
-      let precision = dp;
-      if (absValue > 0 && absValue < Math.pow(10, -dp)) {
-        precision = minDp;
-      }
-      return value.toFixed(precision);
-    }
-
-    function maxPrecision(...values) {
-      return Math.max(...values.map(v => {
-        const str = v.toString().split('.')[1] || '';
-        return str.length;
-      }));
+    function formatNumber(value, dp) {
+      const rounded = Math.round(value * Math.pow(10, dp)) / Math.pow(10, dp);
+      return rounded.toFixed(dp);
     }
 
     function toggleFields() {
@@ -112,57 +101,36 @@
       let calcString = "";
       let breakdown = "";
       let fullResult = 0;
-      let terms = [];
 
       if (type === "random") {
-        const a = A;
-        const r2 = R / 2;
-        const trans = (B * L) / D;
-        fullResult = a + r2 + trans;
-
-        terms = [a, r2, trans];
-        const maxDp = maxPrecision(...terms);
-        const aStr = formatNumber(a, dp, maxDp);
-        const r2Str = formatNumber(r2, dp, maxDp);
-        const transStr = formatNumber(trans, dp, maxDp);
+        const a = formatNumber(A, dp);
+        const r2 = formatNumber(R / 2, dp);
+        const trans = formatNumber((B * L) / D, dp);
+        fullResult = parseFloat(a) + parseFloat(r2) + parseFloat(trans);
 
         formula = "D = A + R/2 + (B × L) / D";
         plugIn = `D = ${A * 1000}/1000 + (1/(${rpm}${rpmUnit === 'rpm' ? '/60' : ''}))/2 + (${B} × ${L})/${D}`;
-        calcString = `= ${aStr} + ${r2Str} + ${transStr}`;
+        calcString = `= ${a} + ${r2} + ${trans}`;
         breakdown = `= ${fullResult.toFixed(dp)} seconds`;
       } else if (type === "sameCyl") {
-        const a = A;
-        const r2 = R / 2;
-        const seeks = r2 * (N / P);
-        const trans = ((B * L) / D) * (N / B);
-        fullResult = a + seeks + trans;
-
-        terms = [a, seeks, trans];
-        const maxDp = maxPrecision(...terms);
-        const aStr = formatNumber(a, dp, maxDp);
-        const seeksStr = formatNumber(seeks, dp, maxDp);
-        const transStr = formatNumber(trans, dp, maxDp);
+        const a = formatNumber(A, dp);
+        const seeks = formatNumber((R / 2) * (N / P), dp);
+        const trans = formatNumber(((B * L) / D) * (N / B), dp);
+        fullResult = parseFloat(a) + parseFloat(seeks) + parseFloat(trans);
 
         formula = "D = A + (R/2 × N / P) + ((B × L) / D × N / B)";
         plugIn = `D = ${A * 1000}/1000 + ((1/(${rpm}${rpmUnit === 'rpm' ? '/60' : ''}))/2 × ${N}/${P}) + ((${B} × ${L})/${D} × ${N}/${B})`;
-        calcString = `= ${aStr} + ${seeksStr} + ${transStr}`;
+        calcString = `= ${a} + ${seeks} + ${trans}`;
         breakdown = `= ${fullResult.toFixed(dp)} seconds`;
       } else if (type === "diffCyl") {
-        const access = A * (N / P);
-        const r2 = R / 2;
-        const seeks = r2 * (N / P);
-        const trans = ((B * L) / D) * (N / B);
-        fullResult = access + seeks + trans;
-
-        terms = [access, seeks, trans];
-        const maxDp = maxPrecision(...terms);
-        const accessStr = formatNumber(access, dp, maxDp);
-        const seeksStr = formatNumber(seeks, dp, maxDp);
-        const transStr = formatNumber(trans, dp, maxDp);
+        const access = formatNumber(A * (N / P), dp);
+        const seeks = formatNumber((R / 2) * (N / P), dp);
+        const trans = formatNumber(((B * L) / D) * (N / B), dp);
+        fullResult = parseFloat(access) + parseFloat(seeks) + parseFloat(trans);
 
         formula = "D = A × (N / P) + (R/2 × N / P) + ((B × L) / D × N / B)";
         plugIn = `D = ${A * 1000}/1000 × (${N}/${P}) + ((1/(${rpm}${rpmUnit === 'rpm' ? '/60' : ''}))/2 × ${N}/${P}) + ((${B} × ${L})/${D} × ${N}/${B})`;
-        calcString = `= ${accessStr} + ${seeksStr} + ${transStr}`;
+        calcString = `= ${access} + ${seeks} + ${trans}`;
         breakdown = `= ${fullResult.toFixed(dp)} seconds`;
       }
 
@@ -171,7 +139,7 @@
         <strong>Expression (Plugged-In):</strong><br>${plugIn}<br><br>
         <strong>Calculated Step-by-Step:</strong><br>${calcString}<br>${breakdown}<br><br>
         <strong>Final Result:</strong> ${fullResult.toFixed(dp)} seconds<br><br>
-        <em>Note: Intermediate values are shown with up to 6 decimal places for clarity.</em>
+        <em>Note: Intermediate values are rounded to ${dp} decimal places with trailing zeros for clarity.</em>
       `;
     });
   </script>
