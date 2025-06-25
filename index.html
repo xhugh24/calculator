@@ -7,61 +7,61 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full">
-    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Disk Data Transfer Time Calculator</h1>
-    <form id="calcForm" class="space-y-4">
-      <div>
-        <label for="type" class="block text-sm font-medium text-gray-700">Calculation Type</label>
-        <select id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-          <option value="random">1. Random Record Access</option>
-          <option value="sameCyl">2. Sequential on Same Cylinder</option>
-          <option value="diffCyl">3. Sequential on Different Cylinders</option>
-        </select>
-      </div>
-      <div>
-        <label for="accessTime" class="block text-sm font-medium text-gray-700">Access Motion Time (ms)</label>
-        <input type="number" id="accessTime" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <div>
-        <label for="rpm" class="block text-sm font-medium text-gray-700">Rotation Speed</label>
-        <input type="number" id="rpm" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <div>
-        <label for="rpmUnit" class="block text-sm font-medium text-gray-700">Speed Unit</label>
-        <select id="rpmUnit" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-          <option value="rpm">RPM (revolutions per minute)</option>
-          <option value="rps">RPS (revolutions per second)</option>
-        </select>
-      </div>
-      <div>
-        <label for="transferRate" class="block text-sm font-medium text-gray-700">Data Transfer Rate (bytes/sec)</label>
-        <input type="number" id="transferRate" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <div>
-        <label for="recordLength" class="block text-sm font-medium text-gray-700">Record Length (bytes)</label>
-        <input type="number" id="recordLength" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <div>
-        <label for="blockingFactor" class="block text-sm font-medium text-gray-700">Blocking Factor</label>
-        <input type="number" id="blockingFactor" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <div id="recordsField">
-        <label for="numRecords" class="block text-sm font-medium text-gray-700">Number of Records</label>
-        <input type="number" id="numRecords" step="1" value="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <div id="trackField">
-        <label for="recordsPerTrack" class="block text-sm font-medium text-gray-700">Records per Track</label>
-        <input type="number" id="recordsPerTrack" step="1" value="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <div>
-        <label for="decimalPlaces" class="block text-sm font-medium text-gray-700">Decimal Places to Round To</label>
-        <input type="number" id="decimalPlaces" value="3" min="0" max="10" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
-      </div>
-      <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Calculate</button>
-    </form>
-    <div id="resultBox" class="mt-6 p-4 bg-gray-50 rounded-md text-gray-800 font-mono text-sm"></div>
-  </div>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-2xl w-full">
+  <h1 class="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">Disk Data Transfer Time Calculator</h1>
+  <form id="calcForm" class="space-y-4">
+    <div>
+      <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Calculation Type</label>
+      <select id="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+        <option value="random">1. Random Record Access</option>
+        <option value="sameCyl">2. Sequential on Same Cylinder</option>
+        <option value="diffCyl">3. Sequential on Different Cylinders</option>
+      </select>
+    </div>
+    <div>
+      <label for="accessTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Access Motion Time (ms)</label>
+      <input type="number" id="accessTime" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <div>
+      <label for="rpm" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rotation Speed</label>
+      <input type="number" id="rpm" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <div>
+      <label for="rpmUnit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Speed Unit</label>
+      <select id="rpmUnit" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+        <option value="rpm">RPM (revolutions per minute)</option>
+        <option value="rps">RPS (revolutions per second)</option>
+      </select>
+    </div>
+    <div>
+      <label for="transferRate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Transfer Rate (bytes/sec)</label>
+      <input type="number" id="transferRate" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <div>
+      <label for="recordLength" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Record Length (bytes)</label>
+      <input type="number" id="recordLength" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <div>
+      <label for="blockingFactor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Blocking Factor</label>
+      <input type="number" id="blockingFactor" step="any" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <div id="recordsField">
+      <label for="numRecords" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Number of Records</label>
+      <input type="number" id="numRecords" step="1" value="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <div id="trackField">
+      <label for="recordsPerTrack" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Records per Track</label>
+      <input type="number" id="recordsPerTrack" step="1" value="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <div>
+      <label for="decimalPlaces" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Decimal Places to Round To</label>
+      <input type="number" id="decimalPlaces" value="3" min="0" max="10" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+    </div>
+    <button type="submit" class="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-colors">Calculate</button>
+  </form>
+  <div id="resultBox" class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-md text-gray-800 dark:text-gray-200 font-mono text-sm"></div>
+</div>
 
   <script>
     function formatNumber(value, dp) {
